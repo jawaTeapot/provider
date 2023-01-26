@@ -1,0 +1,31 @@
+{
+  "name": "provider24-site",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint --ignore-path .gitignore --ext .js,.ts,.vue . --fix"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "eslint": "^8.32.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.9.0",
+    "nuxt": "3.0.0",
+    "prettier": "^2.8.3",
+    "sass": "^1.57.1",
+    "sass-loader": "10",
+    "typescript": "^4.9.4",
+    "vue-eslint-parser": "^9.1.0"
+  },
+  "dependencies": {
+    "@vueform/slider": "^2.1.6",
+    "swiper": "^8.4.5"
+  }
+}

@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+
+  app:
+    image: ${IMAGE_NAME}
+    init: true
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.provider24-site.rule=Host(`${HOST_FRONTEND}`)"
+        - "traefik.http.routers.provider24-site.tls=true"
+        - "traefik.http.routers.provider24-site.tls.certresolver=le"
+        - "traefik.http.services.provider24-site.loadbalancer.server.port=3000"
+        - $AUTH
+        
+
+networks:
+  default:
+    name: rostelecom-network
+    external: true

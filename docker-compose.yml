@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+
+  graphql_frontend:
+    build:
+    
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        NUXT_API_URL: ${NUXT_API_URL}
+        NUXT_STORAGE_URL: ${NUXT_STORAGE_URL}
+    env_file:
+      - .env
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/app
+networks:
+  default:
+    name: rostelecom-network-local
+    external: true

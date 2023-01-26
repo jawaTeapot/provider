@@ -1,0 +1,60 @@
+name: Stage
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  IMAGE_NAME: cr.yandex/crpk8fako11hjk15seg3/${{ github.repository }}:${{ github.head_ref || github.ref_name }}
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: cr.yandex
+          username: json_key
+          password: ${{ secrets.YC_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -f Dockerfile -t ${{ env.IMAGE_NAME }} --build-arg NUXT_API_URL=https://api.stage.rt-provider.ru/v1/graphql --build-arg NUXT_STORAGE_URL=https://storage.stage.rt-provider.ru/ .
+          docker push ${{ env.IMAGE_NAME }}
+
+  deployment:
+    runs-on: ubuntu-latest
+    environment: 
+      name: stage
+      url: https://stage.provider24.ru
+    needs: [build]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v1
+        with:
+          registry: cr.yandex
+          username: json_key
+          password: ${{ secrets.YC_TOKEN }}
+
+      - name: Setup ssh
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.STAGE_SSH_PRIVATE_KEY }}"
+          mkdir ~/.ssh && cp .github/workflows/known_hosts ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          DOCKER_HOST: ssh://master@51.250.1.157
+          HOST_FRONTEND: stage.provider24.ru
+          AUTH: "traefik.http.routers.provider24-site.middlewares=admin-auth"
+        run: |
+          docker stack deploy --prune --with-registry-auth -c docker-stack.yml provider24-site
